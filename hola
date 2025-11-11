@@ -1,0 +1,48 @@
+-- PhaseClient (LocalScript dentro de la herramienta)
+local tool = script.Parent
+local player = game.Players.LocalPlayer
+local char = nil
+local phaseActive = false
+local PHASE_DURATION = 5 -- segundos
+local COOLDOWN = 10 -- segundos entre usos
+local lastUse = 0
+
+local function setCollisionEnabled(model, enabled)
+	for _, part in pairs(model:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = enabled
+		end
+	end
+end
+
+local function setTransparency(model, value)
+	for _, part in pairs(model:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.Transparency = value
+		elseif part:IsA("Decal") then
+			part.Transparency = math.clamp(value, 0, 1)
+		end
+	end
+end
+
+local function activatePhase()
+	if phaseActive then return end
+	local now = tick()
+	if now - lastUse < COOLDOWN then
+		warn("Poder en recarga. Espera unos segundos.")
+		return
+	end
+
+	lastUse = now
+	phaseActive = true
+	char = player.Character
+	if not char then return end
+
+	-- Efecto visual
+	setTransparency(char, 0.6)
+	setCollisionEnabled(char, false)
+
+	-- Efecto de sonido opcional
+	local s = Instance.new("Sound")
+	s.SoundId = "rbxassetid://9118829041" -- sonido tipo “woosh”
+	s.Volume = 1
